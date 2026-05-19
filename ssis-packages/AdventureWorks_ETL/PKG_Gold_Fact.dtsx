@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="5/17/2026 4:30:00 PM"
+  DTS:CreatorComputerName="ABDOUL"
+  DTS:CreatorName="ABDOUL\Dell"
+  DTS:DTSID="{A1B2C3D4-3333-5555-1111-000000000001}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LocaleID="1036"
+  DTS:ObjectName="PKG_Gold_Fact"
+  DTS:PackageType="5"
+  DTS:VersionBuild="1"
+  DTS:VersionGUID="{A1B2C3D4-3333-5555-1111-000000000002}">
+  <DTS:Property DTS:Name="PackageFormatVersion">8</DTS:Property>
+
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[DW_AdventureWorks]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{A1B2C3D4-3333-5555-0001-000000000001}"
+      DTS:ObjectName="DW_AdventureWorks">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=localhost;Initial Catalog=AdventureWorks_DW;Provider=MSOLEDBSQL;Integrated Security=SSPI;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+
+  <DTS:Variables />
+
+  <DTS:Executables>
+    <!-- TASK 1 : Truncate FactVentes -->
+    <DTS:Executable
+      DTS:refId="Package\Truncate FactVentes"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-3333-5555-0001-000000000002}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Truncate FactVentes"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="TRUNCATE TABLE gold.FactVentes;" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <!-- TASK 2 : Load FactVentes with Dimension Lookups -->
+    <DTS:Executable
+      DTS:refId="Package\Load FactVentes"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-3333-5555-0001-000000000003}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load FactVentes"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+INSERT INTO gold.FactVentes
+SELECT
+  ISNULL(CAST(FORMAT(s.OrderDate,'yyyyMMdd') AS INT),19000101),
+  ISNULL(dp.ProductKey,-1), ISNULL(dc.CustomerKey,-1),
+  ISNULL(dt.TerritoryKey,-1), ISNULL(dpr.PromotionKey,-1),
+  s.SalesOrderID, s.SalesOrderDetailID, s.OrderQty, s.UnitPrice, s.UnitPriceDiscount,
+  s.LineTotal, ISNULL(s.OrderQty*s.StandardCost,0),
+  s.LineTotal-ISNULL(s.OrderQty*s.StandardCost,0),
+  CASE WHEN s.SubTotal>0 THEN CAST(s.TaxAmt*(s.LineTotal/s.SubTotal) AS MONEY) ELSE 0 END,
+  CASE WHEN s.SubTotal>0 THEN CAST(s.Freight*(s.LineTotal/s.SubTotal) AS MONEY) ELSE 0 END,
+  s.OrderChannel, s.OrderStatus
+FROM silver.Sales s
+LEFT JOIN gold.DimProduct dp ON s.ProductID=dp.ProductID AND dp.IsCurrent=1
+LEFT JOIN gold.DimCustomer dc ON s.CustomerID=dc.CustomerID
+LEFT JOIN gold.DimTerritory dt ON s.TerritoryID=dt.TerritoryID
+LEFT JOIN gold.DimPromotion dpr ON s.SpecialOfferID=dpr.SpecialOfferID;
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <!-- TASK 3 : Create/Update Indexes -->
+    <DTS:Executable
+      DTS:refId="Package\Create Indexes"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-3333-5555-0001-000000000004}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Create Indexes"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_FactVentes_DateKey')
+  CREATE NONCLUSTERED INDEX IX_FactVentes_DateKey ON gold.FactVentes(DateKey);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_FactVentes_ProductKey')
+  CREATE NONCLUSTERED INDEX IX_FactVentes_ProductKey ON gold.FactVentes(ProductKey);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_FactVentes_CustomerKey')
+  CREATE NONCLUSTERED INDEX IX_FactVentes_CustomerKey ON gold.FactVentes(CustomerKey);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_FactVentes_TerritoryKey')
+  CREATE NONCLUSTERED INDEX IX_FactVentes_TerritoryKey ON gold.FactVentes(TerritoryKey);
+UPDATE STATISTICS gold.FactVentes;
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <!-- TASK 4 : Log Gold Success -->
+    <DTS:Executable
+      DTS:refId="Package\Log Gold Success"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-3333-5555-0001-000000000005}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Log Gold Success"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+INSERT INTO dbo.ETL_LoadLog (LayerName, TableName, RowsInserted, Status, EndTime)
+SELECT 'Gold', 'FactVentes', (SELECT COUNT(*) FROM gold.FactVentes), 'Success', SYSDATETIME();
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <!-- TASK 5 : Recreate FK Constraints -->
+    <DTS:Executable
+      DTS:refId="Package\Recreate FK Constraints"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-3333-5555-0001-000000000006}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Recreate FK Constraints"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name='FK_FactVentes_DimDate')
+  ALTER TABLE gold.FactVentes ADD CONSTRAINT FK_FactVentes_DimDate FOREIGN KEY (DateKey) REFERENCES gold.DimDate(DateKey);
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name='FK_FactVentes_DimProduct')
+  ALTER TABLE gold.FactVentes ADD CONSTRAINT FK_FactVentes_DimProduct FOREIGN KEY (ProductKey) REFERENCES gold.DimProduct(ProductKey);
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name='FK_FactVentes_DimCustomer')
+  ALTER TABLE gold.FactVentes ADD CONSTRAINT FK_FactVentes_DimCustomer FOREIGN KEY (CustomerKey) REFERENCES gold.DimCustomer(CustomerKey);
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name='FK_FactVentes_DimTerritory')
+  ALTER TABLE gold.FactVentes ADD CONSTRAINT FK_FactVentes_DimTerritory FOREIGN KEY (TerritoryKey) REFERENCES gold.DimTerritory(TerritoryKey);
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name='FK_FactVentes_DimPromotion')
+  ALTER TABLE gold.FactVentes ADD CONSTRAINT FK_FactVentes_DimPromotion FOREIGN KEY (PromotionKey) REFERENCES gold.DimPromotion(PromotionKey);
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C1]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-3333-5555-4444-000000000001}" DTS:From="Package\Truncate FactVentes" DTS:LogicalAnd="True" DTS:ObjectName="C1" DTS:To="Package\Load FactVentes" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C2]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-3333-5555-4444-000000000002}" DTS:From="Package\Load FactVentes" DTS:LogicalAnd="True" DTS:ObjectName="C2" DTS:To="Package\Create Indexes" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C3]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-3333-5555-4444-000000000003}" DTS:From="Package\Create Indexes" DTS:LogicalAnd="True" DTS:ObjectName="C3" DTS:To="Package\Log Gold Success" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C4]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-3333-5555-4444-000000000004}" DTS:From="Package\Log Gold Success" DTS:LogicalAnd="True" DTS:ObjectName="C4" DTS:To="Package\Recreate FK Constraints" />
+  </DTS:PrecedenceConstraints>
+</DTS:Executable>
+
+

@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="5/17/2026 4:30:00 PM"
+  DTS:CreatorComputerName="ABDOUL"
+  DTS:CreatorName="ABDOUL\Dell"
+  DTS:DTSID="{A1B2C3D4-3333-3333-1111-000000000001}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LocaleID="1036"
+  DTS:ObjectName="PKG_Gold_Dimensions"
+  DTS:PackageType="5"
+  DTS:VersionBuild="1"
+  DTS:VersionGUID="{A1B2C3D4-3333-3333-1111-000000000002}">
+  <DTS:Property DTS:Name="PackageFormatVersion">8</DTS:Property>
+
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[DW_AdventureWorks]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{A1B2C3D4-3333-2222-0001-000000000001}"
+      DTS:ObjectName="DW_AdventureWorks">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=localhost;Initial Catalog=AdventureWorks_DW;Provider=MSOLEDBSQL;Integrated Security=SSPI;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+
+  <DTS:Variables />
+
+  <DTS:Executables>
+    <!-- TASK 0 : Drop FK Constraints on FactVentes -->
+    <DTS:Executable
+      DTS:refId="Package\Drop FK Constraints"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-3333-3333-0001-000000000010}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Drop FK Constraints"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+DECLARE @sql NVARCHAR(MAX) = '';
+SELECT @sql += 'ALTER TABLE ' + QUOTENAME(s.name) + '.' + QUOTENAME(t.name) + ' DROP CONSTRAINT ' + QUOTENAME(fk.name) + '; '
+FROM sys.foreign_keys fk
+JOIN sys.tables t ON fk.parent_object_id = t.object_id
+JOIN sys.schemas s ON t.schema_id = s.schema_id
+WHERE s.name = 'gold';
+IF LEN(@sql) > 0 EXEC sp_executesql @sql;
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <!-- TASK 1 : Load DimDate -->
+    <DTS:Executable
+      DTS:refId="Package\Load DimDate"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-3333-3333-0001-000000000001}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load DimDate"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+IF (SELECT COUNT(*) FROM gold.DimDate) = 0
+BEGIN
+  ;WITH DateSequence AS (
+    SELECT CAST('2010-01-01' AS DATE) AS dt
+    UNION ALL SELECT DATEADD(DAY,1,dt) FROM DateSequence WHERE dt &lt; '2015-12-31'
+  )
+  INSERT INTO gold.DimDate
+  SELECT CAST(FORMAT(dt,'yyyyMMdd') AS INT), dt, YEAR(dt), DATEPART(QUARTER,dt),
+    'Q'+CAST(DATEPART(QUARTER,dt) AS VARCHAR), MONTH(dt), DATENAME(MONTH,dt),
+    LEFT(DATENAME(MONTH,dt),3), DATEPART(ISO_WEEK,dt), DAY(dt), DATEPART(WEEKDAY,dt),
+    DATENAME(WEEKDAY,dt), LEFT(DATENAME(WEEKDAY,dt),3),
+    CASE WHEN DATEPART(WEEKDAY,dt) IN (1,7) THEN 1 ELSE 0 END,
+    CASE WHEN dt=EOMONTH(dt) THEN 1 ELSE 0 END,
+    CASE WHEN MONTH(dt)>=7 THEN YEAR(dt)+1 ELSE YEAR(dt) END,
+    CASE WHEN MONTH(dt) IN (7,8,9) THEN 1 WHEN MONTH(dt) IN (10,11,12) THEN 2 WHEN MONTH(dt) IN (1,2,3) THEN 3 ELSE 4 END,
+    FORMAT(dt,'yyyy-MM')
+  FROM DateSequence OPTION (MAXRECURSION 2500);
+  IF NOT EXISTS (SELECT 1 FROM gold.DimDate WHERE DateKey=19000101)
+    INSERT INTO gold.DimDate VALUES (19000101,'1900-01-01',1900,1,'Q1',1,'Unknown','Unk',1,1,1,'Unknown','Unk',0,0,1900,1,'1900-01');
+END
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <!-- TASK 2 : Load DimProduct (SCD Type 2) -->
+    <DTS:Executable
+      DTS:refId="Package\Load DimProduct"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-3333-3333-0001-000000000002}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load DimProduct"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+TRUNCATE TABLE gold.DimProduct;
+INSERT INTO gold.DimProduct (ProductID,ProductName,ProductNumber,Color,Size,Weight,StandardCost,ListPrice,ProductLine,Class,Style,SubCategoryName,CategoryName,MakeFlag,FinishedGoodsFlag,EffectiveStartDate,EffectiveEndDate,IsCurrent)
+SELECT ProductID,ProductName,ProductNumber,Color,Size,Weight,StandardCost,ListPrice,ProductLine,Class,Style,SubCategoryName,CategoryName,MakeFlag,FinishedGoodsFlag,SellStartDate,SellEndDate,CASE WHEN SellEndDate IS NULL THEN 1 ELSE 0 END
+FROM silver.Product;
+SET IDENTITY_INSERT gold.DimProduct ON;
+IF NOT EXISTS (SELECT 1 FROM gold.DimProduct WHERE ProductKey=-1)
+  INSERT INTO gold.DimProduct (ProductKey,ProductID,ProductName,ProductNumber,Color,Size,Weight,StandardCost,ListPrice,ProductLine,Class,Style,SubCategoryName,CategoryName,MakeFlag,FinishedGoodsFlag,EffectiveStartDate,EffectiveEndDate,IsCurrent)
+  VALUES (-1,-1,'Unknown','UNK-0000','N/A','N/A',NULL,0,0,'Autre','Non defini','Non defini','Non categorise','Non categorise',0,0,'1900-01-01',NULL,1);
+SET IDENTITY_INSERT gold.DimProduct OFF;
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <!-- TASK 3 : Load DimCustomer -->
+    <DTS:Executable
+      DTS:refId="Package\Load DimCustomer"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-3333-3333-0001-000000000003}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load DimCustomer"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+TRUNCATE TABLE gold.DimCustomer;
+INSERT INTO gold.DimCustomer (CustomerID,CustomerType,FirstName,LastName,FullName,EmailAddress,StoreName,City,StateProvinceName,CountryRegionCode,CountryName)
+SELECT CustomerID,CustomerType,FirstName,LastName,FullName,EmailAddress,StoreName,ISNULL(City,'Unknown'),ISNULL(StateProvinceName,'Unknown'),ISNULL(CountryRegionCode,'N/A'),ISNULL(CountryName,'Unknown')
+FROM silver.Customer;
+SET IDENTITY_INSERT gold.DimCustomer ON;
+IF NOT EXISTS (SELECT 1 FROM gold.DimCustomer WHERE CustomerKey=-1)
+  INSERT INTO gold.DimCustomer (CustomerKey,CustomerID,CustomerType,FullName,City,StateProvinceName,CountryRegionCode,CountryName) VALUES (-1,-1,'Unknown','Unknown Customer','Unknown','Unknown','N/A','Unknown');
+SET IDENTITY_INSERT gold.DimCustomer OFF;
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <!-- TASK 4 : Load DimTerritory + DimPromotion -->
+    <DTS:Executable
+      DTS:refId="Package\Load DimTerritory and DimPromotion"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-3333-3333-0001-000000000004}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load DimTerritory and DimPromotion"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+TRUNCATE TABLE gold.DimTerritory;
+INSERT INTO gold.DimTerritory (TerritoryID,TerritoryName,CountryRegionCode,CountryName,GroupName)
+SELECT TerritoryID,TerritoryName,CountryRegionCode,CountryName,GroupName FROM silver.Territory;
+SET IDENTITY_INSERT gold.DimTerritory ON;
+IF NOT EXISTS (SELECT 1 FROM gold.DimTerritory WHERE TerritoryKey=-1)
+  INSERT INTO gold.DimTerritory (TerritoryKey,TerritoryID,TerritoryName,CountryRegionCode,CountryName,GroupName) VALUES (-1,-1,'Unknown','N/A','Unknown','Unknown');
+SET IDENTITY_INSERT gold.DimTerritory OFF;
+
+TRUNCATE TABLE gold.DimPromotion;
+INSERT INTO gold.DimPromotion (SpecialOfferID,PromotionName,DiscountPct,Type,Category,StartDate,EndDate,MinQty,MaxQty)
+SELECT SpecialOfferID,Description,DiscountPct,Type,Category,StartDate,EndDate,MinQty,MaxQty FROM silver.Promotion;
+SET IDENTITY_INSERT gold.DimPromotion ON;
+IF NOT EXISTS (SELECT 1 FROM gold.DimPromotion WHERE PromotionKey=-1)
+  INSERT INTO gold.DimPromotion (PromotionKey,SpecialOfferID,PromotionName,DiscountPct,Type,Category,StartDate,EndDate,MinQty,MaxQty) VALUES (-1,-1,'No Promotion',0,'N/A','N/A','1900-01-01','9999-12-31',0,NULL);
+SET IDENTITY_INSERT gold.DimPromotion OFF;
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C0]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-3333-4444-0001-000000000000}" DTS:From="Package\Drop FK Constraints" DTS:LogicalAnd="True" DTS:ObjectName="C0" DTS:To="Package\Load DimDate" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C1]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-3333-4444-0001-000000000001}" DTS:From="Package\Load DimDate" DTS:LogicalAnd="True" DTS:ObjectName="C1" DTS:To="Package\Load DimProduct" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C2]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-3333-4444-0001-000000000002}" DTS:From="Package\Load DimDate" DTS:LogicalAnd="True" DTS:ObjectName="C2" DTS:To="Package\Load DimCustomer" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C3]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-3333-4444-0001-000000000003}" DTS:From="Package\Load DimDate" DTS:LogicalAnd="True" DTS:ObjectName="C3" DTS:To="Package\Load DimTerritory and DimPromotion" />
+  </DTS:PrecedenceConstraints>
+</DTS:Executable>
+
+

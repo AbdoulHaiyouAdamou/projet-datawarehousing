@@ -1,0 +1,195 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="5/17/2026 4:30:00 PM"
+  DTS:CreatorComputerName="ABDOUL"
+  DTS:CreatorName="ABDOUL\Dell"
+  DTS:DTSID="{A1B2C3D4-2222-2222-1111-000000000001}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LocaleID="1036"
+  DTS:ObjectName="PKG_Silver_Transform"
+  DTS:PackageType="5"
+  DTS:VersionBuild="1"
+  DTS:VersionGUID="{A1B2C3D4-2222-2222-1111-000000000002}">
+  <DTS:Property DTS:Name="PackageFormatVersion">8</DTS:Property>
+
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[DW_AdventureWorks]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{A1B2C3D4-2222-2222-0001-000000000001}"
+      DTS:ObjectName="DW_AdventureWorks">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=localhost;Initial Catalog=AdventureWorks_DW;Provider=MSOLEDBSQL;Integrated Security=SSPI;Auto Translate=False;" />
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+
+  <DTS:Variables />
+
+  <DTS:Executables>
+    <!-- TASK 1 : Transform Silver Sales -->
+    <DTS:Executable
+      DTS:refId="Package\Transform Silver Sales"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-2222-3333-0001-000000000001}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Transform Silver Sales"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+IF OBJECT_ID('silver.Sales','U') IS NOT NULL TRUNCATE TABLE silver.Sales;
+INSERT INTO silver.Sales
+SELECT h.SalesOrderID, d.SalesOrderDetailID, CAST(h.OrderDate AS DATE), CAST(h.DueDate AS DATE), CAST(h.ShipDate AS DATE),
+  CASE h.[Status] WHEN 1 THEN 'In Process' WHEN 2 THEN 'Approved' WHEN 3 THEN 'Backordered' WHEN 5 THEN 'Shipped' ELSE 'Unknown' END,
+  h.OnlineOrderFlag,
+  CASE WHEN h.OnlineOrderFlag=1 THEN 'Online' ELSE 'Reseller' END,
+  h.CustomerID, h.TerritoryID, d.ProductID, d.SpecialOfferID,
+  d.OrderQty, d.UnitPrice, d.UnitPriceDiscount, d.LineTotal, p.StandardCost,
+  h.SubTotal, h.TaxAmt, h.Freight, h.TotalDue, SYSDATETIME(), 'Bronze'
+FROM bronze.SalesOrderHeader h
+INNER JOIN bronze.SalesOrderDetail d ON h.SalesOrderID=d.SalesOrderID
+LEFT JOIN bronze.Product p ON d.ProductID=p.ProductID
+WHERE h.[Status] NOT IN (4,6);
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <!-- TASK 2 : Transform Silver Product -->
+    <DTS:Executable
+      DTS:refId="Package\Transform Silver Product"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-2222-3333-0001-000000000002}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Transform Silver Product"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+IF OBJECT_ID('silver.Product','U') IS NOT NULL TRUNCATE TABLE silver.Product;
+INSERT INTO silver.Product
+SELECT p.ProductID, p.Name, p.ProductNumber, ISNULL(p.Color,'N/A'), ISNULL(p.Size,'N/A'), p.Weight, p.StandardCost, p.ListPrice,
+  CASE p.ProductLine WHEN 'R' THEN 'Road' WHEN 'M' THEN 'Mountain' WHEN 'T' THEN 'Touring' WHEN 'S' THEN 'Standard' ELSE 'Autre' END,
+  CASE LTRIM(RTRIM(p.Class)) WHEN 'H' THEN 'High' WHEN 'M' THEN 'Medium' WHEN 'L' THEN 'Low' ELSE 'Non defini' END,
+  CASE LTRIM(RTRIM(p.Style)) WHEN 'U' THEN 'Universal' WHEN 'M' THEN 'Men' WHEN 'W' THEN 'Women' ELSE 'Non defini' END,
+  ISNULL(sc.Name,'Non categorise'), ISNULL(c.Name,'Non categorise'),
+  p.MakeFlag, p.FinishedGoodsFlag, CAST(p.SellStartDate AS DATE), CAST(p.SellEndDate AS DATE),
+  CASE WHEN p.SellEndDate IS NULL THEN 1 ELSE 0 END,
+  SYSDATETIME(), 'Bronze'
+FROM bronze.Product p
+LEFT JOIN bronze.ProductSubcategory sc ON p.ProductSubcategoryID=sc.ProductSubcategoryID
+LEFT JOIN bronze.ProductCategory c ON sc.ProductCategoryID=c.ProductCategoryID;
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <!-- TASK 3 : Transform Silver Customer -->
+    <DTS:Executable
+      DTS:refId="Package\Transform Silver Customer"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-2222-3333-0001-000000000003}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Transform Silver Customer"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+IF OBJECT_ID('silver.Customer','U') IS NOT NULL TRUNCATE TABLE silver.Customer;
+INSERT INTO silver.Customer
+SELECT c.CustomerID, c.PersonID, c.StoreID,
+  CASE WHEN c.PersonID IS NOT NULL AND c.StoreID IS NULL THEN 'Individual' WHEN c.StoreID IS NOT NULL THEN 'Store' ELSE 'Unknown' END,
+  p.FirstName, p.LastName,
+  CASE WHEN c.StoreID IS NOT NULL THEN ISNULL(s.Name,'Unknown Store') WHEN p.FirstName IS NOT NULL THEN CONCAT(p.FirstName,' ',p.LastName) ELSE 'Unknown Customer' END,
+  e.EmailAddress, s.Name, c.TerritoryID, a.City, sp.Name, sp.CountryRegionCode, cr.Name,
+  SYSDATETIME(), 'Bronze'
+FROM bronze.Customer c
+LEFT JOIN bronze.Person p ON c.PersonID=p.BusinessEntityID
+LEFT JOIN bronze.EmailAddress e ON c.PersonID=e.BusinessEntityID AND e.EmailAddressID=1
+LEFT JOIN bronze.Store s ON c.StoreID=s.BusinessEntityID
+LEFT JOIN [AdventureWorks2022].Person.BusinessEntityAddress bea ON COALESCE(c.PersonID,c.StoreID)=bea.BusinessEntityID AND bea.AddressTypeID=2
+LEFT JOIN bronze.Address a ON bea.AddressID=a.AddressID
+LEFT JOIN bronze.StateProvince sp ON a.StateProvinceID=sp.StateProvinceID
+LEFT JOIN bronze.CountryRegion cr ON sp.CountryRegionCode=cr.CountryRegionCode;
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <!-- TASK 4 : Transform Silver Territory + Promotion -->
+    <DTS:Executable
+      DTS:refId="Package\Transform Silver Ref Tables"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-2222-3333-0001-000000000004}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Transform Silver Ref Tables"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+IF OBJECT_ID('silver.Territory','U') IS NOT NULL TRUNCATE TABLE silver.Territory;
+INSERT INTO silver.Territory
+SELECT t.TerritoryID, t.Name, t.CountryRegionCode, cr.Name, t.[Group], SYSDATETIME(), 'Bronze'
+FROM bronze.SalesTerritory t
+INNER JOIN bronze.CountryRegion cr ON t.CountryRegionCode=cr.CountryRegionCode;
+
+IF OBJECT_ID('silver.Promotion','U') IS NOT NULL TRUNCATE TABLE silver.Promotion;
+INSERT INTO silver.Promotion
+SELECT SpecialOfferID, Description, CAST(DiscountPct AS DECIMAL(5,4)), Type, Category,
+  CAST(StartDate AS DATE), CAST(EndDate AS DATE), MinQty, MaxQty,
+  CASE WHEN CAST(EndDate AS DATE)>=CAST(GETDATE() AS DATE) THEN 1 ELSE 0 END,
+  SYSDATETIME(), 'Bronze'
+FROM bronze.SpecialOffer;
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+
+    <!-- TASK 5 : Log Silver Success -->
+    <DTS:Executable
+      DTS:refId="Package\Log Silver Success"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A1B2C3D4-2222-3333-0001-000000000005}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Log Silver Success"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+          SQLTask:Connection="DW_AdventureWorks"
+          SQLTask:SqlStatementSource="
+INSERT INTO dbo.ETL_LoadLog (LayerName, TableName, RowsInserted, Status, EndTime)
+SELECT 'Silver', 'All Tables',
+  (SELECT SUM(p.rows) FROM sys.partitions p JOIN sys.tables t ON p.object_id=t.object_id JOIN sys.schemas s ON t.schema_id=s.schema_id WHERE s.name='silver' AND p.index_id IN (0,1)),
+  'Success', SYSDATETIME();
+" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C1]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-2222-4444-0001-000000000001}" DTS:From="Package\Transform Silver Sales" DTS:LogicalAnd="True" DTS:ObjectName="C1" DTS:To="Package\Log Silver Success" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C2]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-2222-4444-0001-000000000002}" DTS:From="Package\Transform Silver Product" DTS:LogicalAnd="True" DTS:ObjectName="C2" DTS:To="Package\Log Silver Success" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C3]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-2222-4444-0001-000000000003}" DTS:From="Package\Transform Silver Customer" DTS:LogicalAnd="True" DTS:ObjectName="C3" DTS:To="Package\Log Silver Success" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[C4]" DTS:CreationName="" DTS:DTSID="{A1B2C3D4-2222-4444-0001-000000000004}" DTS:From="Package\Transform Silver Ref Tables" DTS:LogicalAnd="True" DTS:ObjectName="C4" DTS:To="Package\Log Silver Success" />
+  </DTS:PrecedenceConstraints>
+</DTS:Executable>
+
+
