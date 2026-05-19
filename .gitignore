@@ -1,0 +1,40 @@
+# SQL Server
+*.mdf
+*.ldf
+*.bak
+*.trn
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+bin/
+obj/
+Debug/
+Release/
+
+# SSIS
+*.ispac
+*.dtproj.user
+
+# SSAS
+*.asdatabase
+*.deploymentoptions
+*.deploymenttargets
+*.configsettings
+
+# Power BI
+*.pbix
+!powerbi/*.pbix
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temp
+*.tmp
+*.log
+~$*
