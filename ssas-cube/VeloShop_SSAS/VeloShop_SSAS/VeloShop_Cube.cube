@@ -1,4 +1,4 @@
-﻿<Cube xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400" xmlns:ddl500="http://schemas.microsoft.com/analysisservices/2013/engine/500" xmlns:ddl500_500="http://schemas.microsoft.com/analysisservices/2013/engine/500/500" xmlns:dwd="http://schemas.microsoft.com/DataWarehouse/Designer/1.0" dwd:design-time-name="d968dbae-0e9d-4a26-933b-7f877b2c6064" xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">
+<Cube xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400" xmlns:ddl500="http://schemas.microsoft.com/analysisservices/2013/engine/500" xmlns:ddl500_500="http://schemas.microsoft.com/analysisservices/2013/engine/500/500" xmlns:dwd="http://schemas.microsoft.com/DataWarehouse/Designer/1.0" dwd:design-time-name="d968dbae-0e9d-4a26-933b-7f877b2c6064" xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">
   <ID>VeloShop_Cube</ID>
   <Name>VeloShop_Cube</Name>
   <CreatedTimestamp>0001-01-01T00:00:00Z</CreatedTimestamp>
@@ -215,7 +215,7 @@
       </Attributes>
       <Hierarchies>
         <Hierarchy dwd:design-time-name="73ba0830-8315-4300-a33e-39a0ca899fc2">
-          <HierarchyID>Hiérarchie</HierarchyID>
+          <HierarchyID>Hi�rarchie</HierarchyID>
         </Hierarchy>
       </Hierarchies>
     </Dimension>
@@ -239,7 +239,7 @@
       </Attributes>
       <Hierarchies>
         <Hierarchy dwd:design-time-name="0186f1d1-9846-489c-9f92-78d536b0297b">
-          <HierarchyID>Hiérarchie</HierarchyID>
+          <HierarchyID>Hi�rarchie</HierarchyID>
         </Hierarchy>
       </Hierarchies>
     </Dimension>
@@ -263,7 +263,7 @@
       </Attributes>
       <Hierarchies>
         <Hierarchy dwd:design-time-name="410e6051-11ef-4285-b697-652d43cb459e">
-          <HierarchyID>Hiérarchie</HierarchyID>
+          <HierarchyID>Hi�rarchie</HierarchyID>
         </Hierarchy>
       </Hierarchies>
     </Dimension>
@@ -290,7 +290,7 @@
       </Attributes>
       <Hierarchies>
         <Hierarchy dwd:design-time-name="384341a1-3fda-44b7-9c3a-82cb76dce40c">
-          <HierarchyID>Hiérarchie</HierarchyID>
+          <HierarchyID>Hi�rarchie</HierarchyID>
         </Hierarchy>
       </Hierarchies>
     </Dimension>
@@ -477,19 +477,13 @@
       <LastSchemaUpdate>0001-01-01T00:00:00Z</LastSchemaUpdate>
       <Commands>
         <Command>
-          <Text>/*
-La commande CALCULATE contrôle l'agrégation des cellules feuilles dans le cube.
-Si la commande CALCULATE est supprimée ou modifiée, les données au sein du cube sont affectées.
-Vous devez modifier cette commande uniquement si vous spécifiez manuellement la façon dont le cube est agrégé.
-*/
-CALCULATE
-// Mesure 1 - Marge brute
+          <Text>CALCULATE;
+
 CREATE MEMBER CURRENTCUBE.[Measures].[Gross Profit] AS
 [Measures].[Sales Amount] - [Measures].[Total Product Cost],
 FORMAT_STRING = "Currency",
 VISIBLE = 1;
 
-// Mesure 2 - Taux de marge
 CREATE MEMBER CURRENTCUBE.[Measures].[Gross Margin Pct] AS
 IIF([Measures].[Sales Amount] = 0, NULL,
 ([Measures].[Sales Amount] - [Measures].[Total Product Cost])
@@ -497,38 +491,29 @@ IIF([Measures].[Sales Amount] = 0, NULL,
 FORMAT_STRING = "#,##0.00%",
 VISIBLE = 1;
 
-// Mesure 3 - Valeur moyenne commande
 CREATE MEMBER CURRENTCUBE.[Measures].[Avg Order Value] AS
 IIF([Measures].[Internet Order Count] = 0, NULL,
 [Measures].[Sales Amount] / [Measures].[Internet Order Count]),
 FORMAT_STRING = "Currency",
 VISIBLE = 1;
-// Mesure 4 - Ventes année précédente
+
 CREATE MEMBER CURRENTCUBE.[Measures].[Sales Amount PY] AS
-PARALLELPERIOD(
-[Dim Date].[Calendrier].[Calendar Year],
-1,
-[Dim Date].[Calendrier].CurrentMember),
+PARALLELPERIOD([Dim Date].[Calendrier].[Calendar Year], 1, [Dim Date].[Calendrier].CurrentMember),
 FORMAT_STRING = "Currency",
 VISIBLE = 1;
 
-// Mesure 5 - Croissance YoY
 CREATE MEMBER CURRENTCUBE.[Measures].[Sales Growth YoY] AS
-IIF(
-[Measures].[Sales Amount PY] = 0 
-OR [Measures].[Sales Amount PY] IS NULL,
-NULL,
-([Measures].[Sales Amount] - [Measures].[Sales Amount PY])
-/ [Measures].[Sales Amount PY]),
+IIF([Measures].[Sales Amount PY] = 0 OR [Measures].[Sales Amount PY] IS NULL, NULL,
+([Measures].[Sales Amount] - [Measures].[Sales Amount PY]) / [Measures].[Sales Amount PY]),
 FORMAT_STRING = "#,##0.00%",
-VISIBLE = 1;; </Text>
+VISIBLE = 1;</Text>
         </Command>
       </Commands>
     </MdxScript>
   </MdxScripts>
   <Kpis>
     <Kpi dwd:design-time-name="147796f2-e4cc-4409-b7fe-bd964d36587c">
-      <ID>Indicateur de performance clé</ID>
+      <ID>Indicateur de performance cl�</ID>
       <Name>Revenue Target</Name>
       <Value>[Measures].[Sales Amount]</Value>
       <Goal>5000000</Goal>
