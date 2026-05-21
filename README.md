@@ -1,4 +1,4 @@
-# 📊 Plateforme Décisionnelle — Analyse des Ventes
+# 📊 Plateforme Décisionnelle | Analyse des Ventes
 ## Projet de Fin de Module · Data Warehousing
 
 > Plateforme BI complète pour l'analyse des ventes d'**Adventure Works**, construite avec une architecture **Medallion** (Bronze → Silver → Gold) sur SQL Server.
@@ -62,13 +62,12 @@ sql-scripts/06_kpi_queries.sql          → Requêtes KPI de validation
 ```
 
 ### 3. Configurer SSIS
-Voir le guide : [`docs/guide_ssis.md`](docs/guide_ssis.md)
 
 ### 4. Déployer le cube SSAS
-Voir le guide : [`docs/guide_ssas.md`](docs/guide_ssas.md)
+
 
 ### 5. Connecter Power BI
-Voir le guide : [`docs/guide_powerbi.md`](docs/guide_powerbi.md)
+
 
 ## 📁 Structure du projet
 
