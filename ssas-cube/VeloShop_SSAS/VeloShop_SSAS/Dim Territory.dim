@@ -1,4 +1,4 @@
-﻿<Dimension xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400" xmlns:ddl500="http://schemas.microsoft.com/analysisservices/2013/engine/500" xmlns:ddl500_500="http://schemas.microsoft.com/analysisservices/2013/engine/500/500" xmlns:dwd="http://schemas.microsoft.com/DataWarehouse/Designer/1.0" dwd:design-time-name="61aacb66-f3cb-4fca-9717-1d3567c09f80" xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">
+<Dimension xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200" xmlns:ddl300="http://schemas.microsoft.com/analysisservices/2011/engine/300" xmlns:ddl300_300="http://schemas.microsoft.com/analysisservices/2011/engine/300/300" xmlns:ddl400="http://schemas.microsoft.com/analysisservices/2012/engine/400" xmlns:ddl400_400="http://schemas.microsoft.com/analysisservices/2012/engine/400/400" xmlns:ddl500="http://schemas.microsoft.com/analysisservices/2013/engine/500" xmlns:ddl500_500="http://schemas.microsoft.com/analysisservices/2013/engine/500/500" xmlns:dwd="http://schemas.microsoft.com/DataWarehouse/Designer/1.0" dwd:design-time-name="bc23b77c-fbd1-4372-943b-f89698310fdf" xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">
   <ID>Dim Territory</ID>
   <Name>Dim Territory</Name>
   <CreatedTimestamp>0001-01-01T00:00:00Z</CreatedTimestamp>
@@ -8,7 +8,7 @@
       <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:DiagramLayout</Name>
       <Value>
         <dds xmlns="">
-          <diagram fontclsid="{0BE35203-8F91-11CE-9DE3-00AA004BB851}" mouseiconclsid="{0BE35204-8F91-11CE-9DE3-00AA004BB851}" defaultlayout="MSDDS.Rectilinear" defaultlineroute="MSDDS.Rectilinear" version="7" nextobject="2" scale="100" pagebreakanchorx="0" pagebreakanchory="0" pagebreaksizex="0" pagebreaksizey="0" scrollleft="-2176" scrolltop="-3413" gridx="150" gridy="150" marginx="5000" marginy="5000" zoom="100" x="8070" y="9551" backcolor="2039583" defaultpersistence="2" PrintPageNumbersMode="3" PrintMarginTop="0" PrintMarginBottom="635" PrintMarginLeft="0" PrintMarginRight="0" marqueeselectionmode="0" mousepointer="0" snaptogrid="0" autotypeannotation="1" showscrollbars="0" viewpagebreaks="0" donotforceconnectorsbehindshapes="1" backpictureclsid="{00000000-0000-0000-0000-000000000000}">
+          <diagram fontclsid="{0BE35203-8F91-11CE-9DE3-00AA004BB851}" mouseiconclsid="{0BE35204-8F91-11CE-9DE3-00AA004BB851}" defaultlayout="MSDDS.Rectilinear" defaultlineroute="MSDDS.Rectilinear" version="7" nextobject="2" scale="100" pagebreakanchorx="0" pagebreakanchory="0" pagebreaksizex="0" pagebreaksizey="0" scrollleft="-2176" scrolltop="-3413" gridx="150" gridy="150" marginx="5000" marginy="5000" zoom="100" x="8017" y="14790" backcolor="2039583" defaultpersistence="2" PrintPageNumbersMode="3" PrintMarginTop="0" PrintMarginBottom="635" PrintMarginLeft="0" PrintMarginRight="0" marqueeselectionmode="0" mousepointer="0" snaptogrid="0" autotypeannotation="1" showscrollbars="0" viewpagebreaks="0" donotforceconnectorsbehindshapes="1" backpictureclsid="{00000000-0000-0000-0000-000000000000}">
             <font>
               <ddsxmlobjectstreamwrapper binary="01000000900144420100065461686f6d61" />
             </font>
@@ -19,13 +19,13 @@
           <layoutmanager>
             <ddsxmlobj />
           </layoutmanager>
-          <ddscontrol controlprogid="DdsShapes.DdsObjectManagedBridge" tooltip="DimTerritory" left="-1568" top="-79" logicalid="1" controlid="1" masterid="0" hint1="0" hint2="0" width="3175" height="2725" noresize="0" nomove="0" nodefaultattachpoints="0" autodrag="1" usedefaultiddshape="1" selectable="1" showselectionhandles="1" allownudging="1" isannotation="0" dontautolayout="0" groupcollapsed="0" tabstop="1" visible="1" snaptogrid="0">
+          <ddscontrol controlprogid="DdsShapes.DdsObjectManagedBridge" tooltip="DimTerritory" left="0" top="0" logicalid="1" controlid="1" masterid="0" hint1="0" hint2="0" width="3784" height="3572" noresize="0" nomove="0" nodefaultattachpoints="0" autodrag="1" usedefaultiddshape="1" selectable="1" showselectionhandles="1" allownudging="1" isannotation="0" dontautolayout="0" groupcollapsed="0" tabstop="1" visible="1" snaptogrid="0">
             <control>
-              <ddsxmlobjectstreaminitwrapper binary="000e0000670c0000a50a0000" />
+              <ddsxmlobjectstreaminitwrapper binary="000e0000c80e0000f40d0000" />
             </control>
             <layoutobject>
               <ddsxmlobj>
-                <property name="LogicalObject" value="dbo_DimTerritory" vartype="8" />
+                <property name="LogicalObject" value="gold_DimTerritory" vartype="8" />
               </ddsxmlobj>
             </layoutobject>
             <shape groupshapeid="0" groupnode="0" />
@@ -55,11 +55,11 @@
     </Annotation>
     <Annotation>
       <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:DiagramBoundingLeft</Name>
-      <Value>-1568</Value>
+      <Value>0</Value>
     </Annotation>
     <Annotation>
       <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:DiagramBoundingTop</Name>
-      <Value>-79</Value>
+      <Value>0</Value>
     </Annotation>
     <Annotation>
       <Name>http://schemas.microsoft.com/DataWarehouse/Designer/1.0:DiagramZoom</Name>
@@ -68,41 +68,41 @@
   </Annotations>
   <LastProcessed>0001-01-01T00:00:00Z</LastProcessed>
   <State>Unprocessed</State>
-  <Source xsi:type="DataSourceViewBinding" dwd:design-time-name="e56a306f-e6d1-4339-847b-b40e90d3e038">
+  <Source xsi:type="DataSourceViewBinding" dwd:design-time-name="3bb5c826-5265-46f9-93d1-946037004f19">
     <DataSourceViewID>VeloShop_DSV</DataSourceViewID>
   </Source>
   <UnknownMember>Visible</UnknownMember>
-  <ErrorConfiguration dwd:design-time-name="81a79dfc-1c74-4549-84ca-80859e5920b4">
-    <KeyNotFound>ReportAndStop</KeyNotFound>
-    <KeyDuplicate>ReportAndStop</KeyDuplicate>
-    <NullKeyNotAllowed>ReportAndStop</NullKeyNotAllowed>
+  <ErrorConfiguration dwd:design-time-name="5c56cdaf-06e1-42bd-9f86-604215773c98">
+    <KeyNotFound>IgnoreError</KeyNotFound>
+    <KeyDuplicate>IgnoreError</KeyDuplicate>
+    <NullKeyNotAllowed>IgnoreError</NullKeyNotAllowed>
   </ErrorConfiguration>
   <CurrentStorageMode>Molap</CurrentStorageMode>
   <Attributes>
-    <Attribute dwd:design-time-name="c59f6179-970e-4bf7-bf37-0aa20f295f58">
+    <Attribute dwd:design-time-name="5df50b69-7b06-466f-a467-c0472bdad689">
       <ID>Territory Key</ID>
       <Name>Territory Key</Name>
       <Usage>Key</Usage>
       <KeyColumns>
-        <KeyColumn dwd:design-time-name="bb046095-a7a7-4c78-b17e-7343a393dd2f">
+        <KeyColumn dwd:design-time-name="e851bb7f-18ac-4431-97aa-729d6aca8b04">
           <DataType>Integer</DataType>
           <NullProcessing>UnknownMember</NullProcessing>
-          <Source xsi:type="ColumnBinding" dwd:design-time-name="1f4e31d5-e203-4d96-bf2d-3b89c08e9b3d">
-            <TableID>dbo_DimTerritory</TableID>
+          <Source xsi:type="ColumnBinding" dwd:design-time-name="70fa7a51-821d-4ac8-b187-d5d74dfccf3f">
+            <TableID>gold_DimTerritory</TableID>
             <ColumnID>TerritoryKey</ColumnID>
           </Source>
         </KeyColumn>
       </KeyColumns>
       <AttributeRelationships>
-        <AttributeRelationship dwd:design-time-name="dc2ccdec-f1df-40d9-8eb6-c9c7a88d904d">
+        <AttributeRelationship dwd:design-time-name="72dda179-1738-425f-bbff-cfac56bd36fa">
           <AttributeID>Territory Group</AttributeID>
           <Name>Territory Group</Name>
         </AttributeRelationship>
-        <AttributeRelationship dwd:design-time-name="0876ef4b-0278-48ce-bf4b-3805811c0d26">
+        <AttributeRelationship dwd:design-time-name="e8629618-6e4d-4e86-b723-8e84c9b2f217">
           <AttributeID>Territory Country</AttributeID>
           <Name>Territory Country</Name>
         </AttributeRelationship>
-        <AttributeRelationship dwd:design-time-name="78989eb6-ff1c-477f-a4d5-125b698a204a">
+        <AttributeRelationship dwd:design-time-name="2196b2dd-368c-4416-ac0d-4c8ae63f749f">
           <AttributeID>Territory Region</AttributeID>
           <Name>Territory Region</Name>
         </AttributeRelationship>
@@ -111,48 +111,48 @@
       <ddl200:ProcessingState>Unprocessed</ddl200:ProcessingState>
       <ddl300:AttributeHierarchyProcessingState>Unprocessed</ddl300:AttributeHierarchyProcessingState>
     </Attribute>
-    <Attribute dwd:design-time-name="06af765d-5ae8-4377-81c6-34401a6e89d1">
+    <Attribute dwd:design-time-name="a3efea91-b7f6-41a4-9830-dbbe8287f8e2">
       <ID>Territory Group</ID>
       <Name>Territory Group</Name>
       <KeyColumns>
-        <KeyColumn dwd:design-time-name="64ce8e05-51d4-4965-bf31-dabcfa7275a9">
+        <KeyColumn dwd:design-time-name="faf20601-2398-40b0-b5cc-71a7c164f006">
           <DataType>WChar</DataType>
           <DataSize>50</DataSize>
-          <Source xsi:type="ColumnBinding" dwd:design-time-name="4fa9ec15-baef-4217-8cd1-a73e9a432df2">
-            <TableID>dbo_DimTerritory</TableID>
-            <ColumnID>TerritoryGroup</ColumnID>
+          <Source xsi:type="ColumnBinding" dwd:design-time-name="06144ad0-0075-4c82-bd98-a652776656f1">
+            <TableID>gold_DimTerritory</TableID>
+            <ColumnID>GroupName</ColumnID>
           </Source>
         </KeyColumn>
       </KeyColumns>
       <ddl200:ProcessingState>Unprocessed</ddl200:ProcessingState>
       <ddl300:AttributeHierarchyProcessingState>Unprocessed</ddl300:AttributeHierarchyProcessingState>
     </Attribute>
-    <Attribute dwd:design-time-name="924b05cc-28cc-4544-b2a7-a6f2e2d81f6f">
+    <Attribute dwd:design-time-name="2dc619f0-b77f-4a23-b7f1-22a18869e921">
       <ID>Territory Country</ID>
       <Name>Territory Country</Name>
       <KeyColumns>
-        <KeyColumn dwd:design-time-name="2fdff767-d366-4e9b-93fb-e8aad489b408">
+        <KeyColumn dwd:design-time-name="4aaca388-4beb-446d-8f86-eb1d2fbfa06a">
           <DataType>WChar</DataType>
           <DataSize>50</DataSize>
-          <Source xsi:type="ColumnBinding" dwd:design-time-name="ef303362-3cf6-4de3-b22e-99c866fd2083">
-            <TableID>dbo_DimTerritory</TableID>
-            <ColumnID>TerritoryCountry</ColumnID>
+          <Source xsi:type="ColumnBinding" dwd:design-time-name="027a2d41-2b30-4d57-b1d0-eddb53db2362">
+            <TableID>gold_DimTerritory</TableID>
+            <ColumnID>CountryName</ColumnID>
           </Source>
         </KeyColumn>
       </KeyColumns>
       <ddl200:ProcessingState>Unprocessed</ddl200:ProcessingState>
       <ddl300:AttributeHierarchyProcessingState>Unprocessed</ddl300:AttributeHierarchyProcessingState>
     </Attribute>
-    <Attribute dwd:design-time-name="48700c6e-2109-4a9e-b93b-47df8e8cab70">
+    <Attribute dwd:design-time-name="c297d0e5-236b-491c-8efa-9f48e5bd4f4b">
       <ID>Territory Region</ID>
       <Name>Territory Region</Name>
       <KeyColumns>
-        <KeyColumn dwd:design-time-name="0acecd6e-9d47-4ab4-a0db-891c3ef5c5f5">
+        <KeyColumn dwd:design-time-name="8b65235b-b6a4-4149-b649-4239e580a7ea">
           <DataType>WChar</DataType>
           <DataSize>50</DataSize>
-          <Source xsi:type="ColumnBinding" dwd:design-time-name="85854db1-0e6e-4abe-94d7-9b81cf4e0cfe">
-            <TableID>dbo_DimTerritory</TableID>
-            <ColumnID>TerritoryRegion</ColumnID>
+          <Source xsi:type="ColumnBinding" dwd:design-time-name="4dcd1ca4-253d-41e5-9efe-c5913b53f496">
+            <TableID>gold_DimTerritory</TableID>
+            <ColumnID>TerritoryName</ColumnID>
           </Source>
         </KeyColumn>
       </KeyColumns>
@@ -161,21 +161,21 @@
     </Attribute>
   </Attributes>
   <Hierarchies>
-    <Hierarchy dwd:design-time-name="7b830e72-ac12-4abb-aa0e-9ab4e2d7fb48">
-      <ID>Hiérarchie</ID>
+    <Hierarchy dwd:design-time-name="4d404862-49e7-471d-acca-2cc39506ecda">
+      <ID>Hi�rarchie</ID>
       <Name>Geographie</Name>
       <Levels>
-        <Level dwd:design-time-name="f2fe28a6-ceb1-4a30-a3fd-69da18794d0d">
+        <Level dwd:design-time-name="ac7218ad-d328-4979-9fed-009a7349d5f7">
           <ID>Territory Group</ID>
           <Name>Territory Group</Name>
           <SourceAttributeID>Territory Group</SourceAttributeID>
         </Level>
-        <Level dwd:design-time-name="98bb78f8-75c8-4bbe-ab97-efa8cde4b355">
+        <Level dwd:design-time-name="73b995ab-b5d7-418a-9d24-5d4d915fe1bb">
           <ID>Territory Country</ID>
           <Name>Territory Country</Name>
           <SourceAttributeID>Territory Country</SourceAttributeID>
         </Level>
-        <Level dwd:design-time-name="fd8898c2-e28e-4cf4-bb60-d901052b4ac9">
+        <Level dwd:design-time-name="c3051c87-71f1-46e4-9604-93e352c08d08">
           <ID>Territory Region</ID>
           <Name>Territory Region</Name>
           <SourceAttributeID>Territory Region</SourceAttributeID>
